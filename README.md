@@ -16,3 +16,21 @@ Siguientes pasos recomendados:
 - Formulario para crear/editar productos.
 - Mejorar UI y agregar impresión de ticket.
 - Validaciones y manejo de errores más robusto.
+
+---
+
+## Ejecutar tests (PHPUnit) ✅
+
+1. Instala dependencias: `composer install`.
+2. Asegúrate de que la base de datos esté creada e importadas las migraciones (`migrations/init.sql`, y si corresponde `migrations/add_cost_to_products.sql` y `migrations/add_purchases_and_suppliers.sql`).
+3. Configura la conexión en `config/db.php` (constantes `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`).
+4. Ejecuta los tests:
+   - `vendor/bin/phpunit` (o `vendor\bin\phpunit` en Windows PowerShell).
+   - Para ejecutar un archivo concreto: `vendor/bin/phpunit tests/PurchaseProcessorTest.php`.
+
+Notas útiles:
+
+- Durante las pruebas, algunos scripts web (p. ej. `public/export_purchases.php`) emiten cabeceras o llaman a `exit()`. Para facilitar la inclusión de esos scripts en los tests, la suite define la constante `PHPUNIT_RUNNING` en `tests/bootstrap.php`. Por eso verás pequeñas adaptaciones en `src/Auth.php` y `public/export_purchases.php` — esto permite que PHPUnit incluya estas páginas sin terminar el proceso o requerir un entorno HTTP completo.
+- Asegúrate de tener la extensión `zip` habilitada en PHP y `git`/`7-zip` disponibles si usas Composer en Windows.
+
+Si quieres, puedo añadir un `Makefile` o scripts `composer` (ej.: `composer test`) para simplificar estos pasos.
