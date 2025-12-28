@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: luis
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pluis"
+          --health-interval=10s --health-timeout=5s --health-retries=3
+    env:
+      DB_HOST: 127.0.0.1
+      DB_NAME: sistema_kiosco
+      DB_USER: root
+      DB_PASS: luis
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo_mysql, zip
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist
+
+      - name: Wait for MySQL
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -pluis --silent; then
+              echo "MySQL is up" && break;
+            fi
+            sleep 1
+          done
+
+      - name: Create database and run migrations
+        run: |
+          php -r "try {\n              \$pdo = new PDO('mysql:host=127.0.0.1;charset=utf8mb4', 'root', 'luis');\n              \$pdo->exec('CREATE DATABASE IF NOT EXISTS sistema_kiosco');\n              \$sql = file_get_contents('migrations/init.sql');\n              foreach (explode(';', \$sql) as \$s) { if (trim(\$s)) \$pdo->exec(\$s); }\n            } catch (Exception \$e) { echo 'Migration error: ' . \$e->getMessage(); exit(1); }"
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --testdox
