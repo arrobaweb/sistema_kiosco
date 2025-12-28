@@ -34,3 +34,15 @@ Notas útiles:
 - Asegúrate de tener la extensión `zip` habilitada en PHP y `git`/`7-zip` disponibles si usas Composer en Windows.
 
 Si quieres, puedo añadir un `Makefile` o scripts `composer` (ej.: `composer test`) para simplificar estos pasos.
+
+---
+
+### Scripts de conveniencia
+
+- `composer test` — ejecuta la suite de PHPUnit.
+- `php migrations/run.php` — ejecuta en orden todas las migraciones SQL que estén en `migrations/`.
+
+Ejemplos:
+
+- `composer test` — corre los tests.
+- `php migrations/run.php` — aplica las migraciones a la base de datos configurada en `config/db.php`.
